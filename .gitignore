@@ -1,0 +1,4 @@
+node_modules
+
+# dependencies-cli test cache
+.cache

@@ -1,0 +1,21 @@
+collectors:
+
+- type: python-pip
+  path: requirements_test.txt
+  actors:
+  - type: python-pip
+    versions: "Y.Y.Y"
+
+- type: git-repo
+  path: git_dependencies.yml
+  actors:
+  - type: find-replace
+    versions: "Y.Y.Y"
+    dependencies: "https://github.com/dependencies-io/pullrequest"
+    settings:
+      paths:
+      - git_dependencies.yml
+      - Dockerfile
+      patterns:
+      - "installed: {version}"
+      - "PULLREQUEST_VERSION={version}"

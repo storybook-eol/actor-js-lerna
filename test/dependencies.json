@@ -1,0 +1,56 @@
+{
+    "dependencies": [
+        {
+            "name": "react",
+            "installed": {
+                "version": "15.6.0"
+            },
+            "available": [
+                {
+                    "version": "15.6.1"
+                }
+            ],
+            "source": "npm",
+            "path": "example"
+        },
+        {
+            "name": "prettier",
+            "installed": {
+                "version": "1.5.3"
+            },
+            "available": [
+                {
+                    "version": "1.6.0"
+                }
+            ],
+            "source": "npm",
+            "path": "example"
+        },
+        {
+            "name": "prettier",
+            "installed": {
+                "version": "1.5.3"
+            },
+            "available": [
+                {
+                    "version": "1.6.0"
+                }
+            ],
+            "source": "npm",
+            "path": "/"
+        },
+        {
+            "name": "lerna",
+            "installed": {
+                "version": "2.1.0"
+            },
+            "available": [
+                {
+                    "version": "2.1.2"
+                }
+            ],
+            "source": "npm",
+            "path": "/"
+        }
+    ]
+}

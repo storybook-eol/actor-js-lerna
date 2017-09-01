@@ -1,0 +1,10 @@
+{
+  "lerna": "2.0.0",
+  "packages": [
+    "example"
+  ],
+  "concurrency": 1,
+  "npmClient": "yarn",
+  "npmClientArgs": ["--no-package-lock"],
+  "version": "3.2.9"
+}

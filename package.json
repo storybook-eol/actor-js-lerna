@@ -1,0 +1,13 @@
+{
+  "name": "actor-js-lerna",
+  "version": "1.0.0",
+  "main": "entrypoint.js",
+  "repository": "https://github.com/dependencies-io/actor-js-lerna",
+  "author": "js@dropseed.io",
+  "license": "MPL 2.0",
+  "dependencies": {
+    "lerna": "^2.1.2",
+    "shell-quote": "1.6.1",
+    "shelljs": "0.7.7"
+  }
+}

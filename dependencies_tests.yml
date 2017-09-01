@@ -1,0 +1,22 @@
+name: actor-js-lerna
+type: actor
+
+cases:
+
+- name: lerna with yarn
+  dockerfile: Dockerfile
+  repo_contents: test/repo
+  dependencies_json: test/dependencies.json
+  tests:
+    - |
+        git checkout prettier-1.6.0-0.0.0 && \
+        diff -r -x ".git*" -x node_modules ${CWD}/test/repo_root_prettier_final/ ./
+    - |
+        git checkout prettier-1.6.0-0.0.0-example && \
+        diff -r -x ".git*" -x node_modules ${CWD}/test/repo_example_prettier_final/ ./
+    - |
+        git checkout react-15.6.1-0.0.0-example && \
+        diff -r -x ".git*" -x node_modules ${CWD}/test/repo_example_react_final/ ./
+    - |
+        git checkout lerna-2.1.2-0.0.0 && \
+        diff -r -x ".git*" -x node_modules ${CWD}/test/repo_root_lerna_final/ ./
