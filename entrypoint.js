@@ -23,8 +23,6 @@ if (NPMRC) {
     console.log(NPMRC)
 }
 
-bootstrap()
-
 dependencies.forEach(function(dependency) {
   console.log(dependency)
 
