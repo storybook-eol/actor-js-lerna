@@ -19,7 +19,7 @@ collectors:
     versions: "L.Y.Y"
     settings:
         # please use --concurrency=1 if you provide your own command
-      bootstrap_command: lerna bootstrap --concurrency 1 --hoist
+      bootstrap_command: lerna bootstrap --concurrency 1  # this is the default
       # optional contents to put in ~/.npmrc
       npmrc: |
         registry=https://skimdb.npmjs.com/registry

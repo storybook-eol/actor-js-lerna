@@ -7,6 +7,9 @@ cases:
   dockerfile: Dockerfile
   repo_contents: test/repo
   dependencies_json: test/dependencies.json
+  user_config:
+    settings:
+      bootstrap_command: lerna bootstrap --concurrency 1 --hoist
   tests:
     - |
         git checkout prettier-1.6.0-0.0.0 && \

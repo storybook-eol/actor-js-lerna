@@ -13,7 +13,8 @@ const dependencies = JSON.parse(process.env.DEPENDENCIES)['dependencies']
 shell.set('-e')  // any failing shell commands will fail
 
 function bootstrap() {
-    shell.exec(`cd ${REPO_PATH} && ` + (process.env.SETTING_BOOTSTRAP_COMMAND || 'lerna bootstrap --concurrency 1 --hoist'))
+    shell.exec('lerna clean --yes')
+    shell.exec(process.env.SETTING_BOOTSTRAP_COMMAND || 'lerna bootstrap --concurrency 1')
 }
 
 if (NPMRC) {
