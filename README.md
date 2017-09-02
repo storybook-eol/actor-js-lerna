@@ -5,8 +5,7 @@
 [![license](https://img.shields.io/github/license/dependencies-io/actor-js-lerna.svg)](https://github.com/dependencies-io/actor-js-lerna/blob/master/LICENSE)
 
 A [dependencies.io](https://www.dependencies.io)
-[actor](https://www.dependencies.io/docs/actors/) for updating `package.json` dependencies and creating a pull request on GitHub with those changes. Also
-updates `package-lock.json` and `yarn.lock` files if present.
+[actor](https://www.dependencies.io/docs/actors/) for JS monorepo dependencies using [Lerna](https://lernajs.io/).
 
 ## Usage
 
