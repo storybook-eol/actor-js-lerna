@@ -19,3 +19,9 @@ collectors:
       patterns:
       - "installed: {version}"
       - "PULLREQUEST_VERSION={version}"
+
+- type: js-npm
+  path: /
+  actors:
+  - type: js-npm
+    versions: "Y.Y.Y"
