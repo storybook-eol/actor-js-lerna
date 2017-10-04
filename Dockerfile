@@ -19,7 +19,7 @@ ADD yarn.lock /usr/src/actor
 RUN yarn install
 
 # add lerna to the PATH
-ENV PATH="/usr/src/actor/node_modules/.bin:${PATH}"
+ENV PATH="/repo/node_modules/.bin:/usr/src/actor/node_modules/.bin:${PATH}"
 
 # add the pullrequest utility to easily create pull requests on different git hosts
 ENV PULLREQUEST_VERSION=0.3.0
