@@ -13,7 +13,11 @@ const dependencies = JSON.parse(process.env.DEPENDENCIES)['dependencies']
 shell.set('-e')  // any failing shell commands will fail
 
 function bootstrap() {
-    shell.exec('lerna clean --yes')
+    try {
+        shell.exec('lerna clean --yes')
+    } catch (e) {
+        console.log('Unable to run `lerna clean`, check output.')
+    }
     shell.exec(process.env.SETTING_BOOTSTRAP_COMMAND || 'lerna bootstrap --concurrency 1')
 }
 
@@ -22,8 +26,6 @@ if (NPMRC) {
     fs.writeFileSync('/home/app/.npmrc', NPMRC)
     console.log(NPMRC)
 }
-
-bootstrap()
 
 dependencies.forEach(function(dependency) {
   console.log(dependency)
