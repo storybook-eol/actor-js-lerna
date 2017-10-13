@@ -12,6 +12,18 @@ const dependencies = JSON.parse(process.env.DEPENDENCIES)['dependencies']
 
 shell.set('-e')  // any failing shell commands will fail
 
+// first need to install root dependencies so that the repo's version
+// of lerna is available
+if (process.env.SETTING_ROOT_INSTALL_COMMAND) {
+    shell.exec(process.env.SETTING_ROOT_INSTALL_COMMAND)
+} else if (fs.existsSync('yarn.lock')) {
+    shell.exec('yarn install --ignore-scripts --frozen-lockfile --non-interactive')
+} else if (fs.existsSync('package-lock.json')) {
+    shell.exec('npm install --ignore-scripts --quiet')
+} else if (fs.existsSync('package.json')) {
+    shell.exec('npm install --ignore-scripts --quiet --no-package-lock')
+}
+
 function bootstrap() {
     try {
         shell.exec('lerna clean --yes')

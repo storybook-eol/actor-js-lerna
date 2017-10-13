@@ -18,7 +18,10 @@ collectors:
   - type: js-lerna
     versions: "L.Y.Y"
     settings:
-        # please use --concurrency=1 if you provide your own command
+      # by default we autodetect npm/yarn and do basic install
+      root_install_command: npm run your-install-script
+
+      # please use --concurrency=1 if you provide your own command
       bootstrap_command: lerna bootstrap --concurrency 1  # this is the default
       # optional contents to put in ~/.npmrc
       npmrc: |
