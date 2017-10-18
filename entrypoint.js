@@ -8,6 +8,7 @@ const TESTING = (process.env.DEPENDENCIES_ENV || 'production') == 'test'
 const ACTOR_ID = process.env.ACTOR_ID
 const GIT_SHA = process.env.GIT_SHA
 const NPMRC = process.env.SETTING_NPMRC
+const BATCH_MODE = JSON.parse(process.env.SETTING_BATCH_MODE || 'false')
 const dependencies = JSON.parse(process.env.DEPENDENCIES)['dependencies']
 
 shell.set('-e')  // any failing shell commands will fail
@@ -25,18 +26,26 @@ if (process.env.SETTING_ROOT_INSTALL_COMMAND) {
 }
 
 function bootstrap() {
+  if (!BATCH_MODE) {
     try {
         shell.exec('lerna clean --yes')
     } catch (e) {
         console.log('Unable to run `lerna clean`, check output.')
     }
-    shell.exec(process.env.SETTING_BOOTSTRAP_COMMAND || 'lerna bootstrap --concurrency 1')
+  }
+  shell.exec(process.env.SETTING_BOOTSTRAP_COMMAND || 'lerna bootstrap --concurrency 1')
 }
 
 if (NPMRC) {
     console.log('.npmrc contents found in settings, writing to /home/app/.npmrc...')
     fs.writeFileSync('/home/app/.npmrc', NPMRC)
     console.log(NPMRC)
+}
+
+let batchPrBody = ''
+const batchPrBranchName = `dependencies.io-update-build-${ACTOR_ID}`
+if (BATCH_MODE) {
+  shell.exec(`git checkout -b ${batchPrBranchName}`)
 }
 
 dependencies.forEach(function(dependency) {
@@ -57,15 +66,19 @@ dependencies.forEach(function(dependency) {
   }
   const msg = `Update ${name} from ${installed} to ${version} in ${dependency.path}`
 
-  let prBody = `${name} has been updated to ${version} in ${dependency.path} by dependencies.io`
+  let prBody = `${name} has been updated from ${installed} to ${version} in ${dependency.path} by dependencies.io`
   dependency.available.forEach(function(available) {
-      const content = available.hasOwnProperty('content') ? available.content : '_No content found._'
-      prBody += `\n\n## ${available.version}\n\n${content}`
+    const content = available.hasOwnProperty('content') ? available.content : '_No content found._'
+    prBody += `\n\n## ${available.version}\n\n${content}`
   })
 
-  // branch off of the original commit that this build is on
-  shell.exec(`git checkout ${GIT_SHA}`)
-  shell.exec(`git checkout -b ${branchName}`)
+  batchPrBody += prBody + '\n\n---\n\n'
+
+  if (!BATCH_MODE) {
+    // branch off of the original commit that this build is on
+    shell.exec(`git checkout ${GIT_SHA}`)
+    shell.exec(`git checkout -b ${branchName}`)
+  }
 
   let packageJsonVersionSpecifier
   if (isDevDependency) {
@@ -98,11 +111,25 @@ dependencies.forEach(function(dependency) {
   shell.exec('git add .')
   shell.exec(`git commit -m "${msg}"`)
 
+  if (!BATCH_MODE) {
+    if (!TESTING) {
+      shell.exec(`git push --set-upstream origin ${branchName}`)
+      shell.exec(shellQuote.quote(['pullrequest', '--branch', branchName, '--title', msg, '--body', prBody]))
+    }
+    dependencyJSON = JSON.stringify({'dependencies': [dependency]})
+    console.log(`BEGIN_DEPENDENCIES_SCHEMA_OUTPUT>${dependencyJSON}<END_DEPENDENCIES_SCHEMA_OUTPUT`)
+  }
+})
+
+if (BATCH_MODE) {
+  const msg = dependencies.length + ' packages updated by dependencies.io'
+
   if (!TESTING) {
-    shell.exec(`git push --set-upstream origin ${branchName}`)
-    shell.exec(shellQuote.quote(['pullrequest', '--branch', branchName, '--title', msg, '--body', prBody]))
+    shell.exec(`git push --set-upstream origin ${batchPrBranchName}`)
+    shell.exec(shellQuote.quote(['pullrequest', '--branch', batchPrBranchName, '--title', msg, '--body', batchPrBody]))
   }
 
-  dependencyJSON = JSON.stringify({'dependencies': [dependency]})
+  // mark them all complete at once
+  dependencyJSON = JSON.stringify({'dependencies': dependencies})
   console.log(`BEGIN_DEPENDENCIES_SCHEMA_OUTPUT>${dependencyJSON}<END_DEPENDENCIES_SCHEMA_OUTPUT`)
-})
+}

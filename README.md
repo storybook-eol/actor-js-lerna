@@ -23,9 +23,13 @@ collectors:
 
       # please use --concurrency=1 if you provide your own command
       bootstrap_command: lerna bootstrap --concurrency 1  # this is the default
+
       # optional contents to put in ~/.npmrc
       npmrc: |
         registry=https://skimdb.npmjs.com/registry
+
+      # false by default, set to true if you want all dependency updates in a single PR
+      batch_mode: false
 
       # github options
       github_labels:  # list of label names

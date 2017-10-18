@@ -23,3 +23,16 @@ cases:
     - |
         git checkout lerna-2.1.2-0.0.0 && \
         diff -r -x ".git*" -x node_modules ${CWD}/test/repo_root_lerna_final/ ./
+
+- name: lerna with yarn batched
+  dockerfile: Dockerfile
+  repo_contents: test/repo
+  dependencies_json: test/dependencies.json
+  user_config:
+    settings:
+      bootstrap_command: lerna bootstrap --concurrency 1 --hoist
+      batch_mode: true
+  tests:
+    - |
+        git checkout dependencies.io-update-build-0.0.0 && \
+        diff -r -x ".git*" -x node_modules ${CWD}/test/repo_batch_final/ ./
