@@ -124,6 +124,9 @@ dependencies.forEach(function(dependency) {
 if (BATCH_MODE) {
   const msg = dependencies.length + ' packages updated by dependencies.io'
 
+  const prBodySummary = dependencies.map(dep => `- ${dep.name} from ${dep.installed} to ${dep.available[0].version} in ${dep.path}`).join('\n')
+  batchPrBody = '## Summary\n\n' + prBodySummary + '\n\n---\n\n' + batchPrBody
+
   if (!TESTING) {
     shell.exec(`git push --set-upstream origin ${batchPrBranchName}`)
     shell.exec(shellQuote.quote(['pullrequest', '--branch', batchPrBranchName, '--title', msg, '--body', batchPrBody]))
