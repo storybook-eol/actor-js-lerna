@@ -6,7 +6,7 @@
   "author": "js@dropseed.io",
   "license": "MPL 2.0",
   "dependencies": {
-    "lerna": "^2.4.0",
+    "lerna": "^2.5.1",
     "npm": "^5.5.1",
     "shell-quote": "1.6.1",
     "shelljs": "0.7.8",

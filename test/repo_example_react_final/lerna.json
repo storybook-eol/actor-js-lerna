@@ -4,7 +4,6 @@
     "example"
   ],
   "concurrency": 1,
-  "npmClient": "yarn",
   "npmClientArgs": ["--no-package-lock"],
   "version": "3.2.9"
 }
