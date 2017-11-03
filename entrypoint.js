@@ -42,7 +42,6 @@ if (NPMRC) {
     console.log(NPMRC)
 }
 
-let batchPrBody = ''
 const batchPrBranchName = `dependencies.io-update-build-${ACTOR_ID}`
 if (BATCH_MODE) {
   shell.exec(`git checkout -b ${batchPrBranchName}`)
@@ -65,14 +64,6 @@ dependencies.forEach(function(dependency) {
       branchName = branchName + '-' + dependency.path.replace('/', '--')
   }
   const msg = `Update ${name} from ${installed} to ${version} in ${dependency.path}`
-
-  let prBody = `${name} has been updated from ${installed} to ${version} in ${dependency.path} by dependencies.io`
-  dependency.available.forEach(function(available) {
-    const content = available.hasOwnProperty('content') ? available.content : '_No content found._'
-    prBody += `\n\n## ${available.version}\n\n${content}`
-  })
-
-  batchPrBody += prBody + '\n\n---\n\n'
 
   if (!BATCH_MODE) {
     // branch off of the original commit that this build is on
@@ -114,22 +105,23 @@ dependencies.forEach(function(dependency) {
   if (!BATCH_MODE) {
     if (!TESTING) {
       shell.exec(`git push --set-upstream origin ${branchName}`)
-      shell.exec(shellQuote.quote(['pullrequest', '--branch', branchName, '--title', msg, '--body', prBody]))
     }
     dependencyJSON = JSON.stringify({'dependencies': [dependency]})
+    shell.exec(shellQuote.quote(['pullrequest', '--branch', branchName, '--dependencies-schema', dependencyJSON, '--title-from-schema', '--body-from-schema']))
     console.log(`BEGIN_DEPENDENCIES_SCHEMA_OUTPUT>${dependencyJSON}<END_DEPENDENCIES_SCHEMA_OUTPUT`)
   }
 })
 
 if (BATCH_MODE) {
   const msg = dependencies.length + ' packages updated by dependencies.io'
+  dependencyJSON = JSON.stringify({'dependencies': dependencies})
 
   if (!TESTING) {
     shell.exec(`git push --set-upstream origin ${batchPrBranchName}`)
-    shell.exec(shellQuote.quote(['pullrequest', '--branch', batchPrBranchName, '--title', msg, '--body', batchPrBody]))
   }
 
+  shell.exec(shellQuote.quote(['pullrequest', '--branch', batchPrBranchName, '--dependencies-schema', dependencyJSON, '--title-from-schema', '--body-from-schema']))
+
   // mark them all complete at once
-  dependencyJSON = JSON.stringify({'dependencies': dependencies})
   console.log(`BEGIN_DEPENDENCIES_SCHEMA_OUTPUT>${dependencyJSON}<END_DEPENDENCIES_SCHEMA_OUTPUT`)
 }
