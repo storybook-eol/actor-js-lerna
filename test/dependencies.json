@@ -7,8 +7,7 @@
             },
             "available": [
                 {
-                    "version": "15.6.1",
-                    "content": "This isn't going to cause any issues! Sweet."
+                    "version": "15.6.1"
                 }
             ],
             "source": "npm",
