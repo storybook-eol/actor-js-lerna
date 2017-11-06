@@ -7,7 +7,8 @@
             },
             "available": [
                 {
-                    "version": "15.6.1"
+                    "version": "15.6.1",
+                    "content": "This won't break it! Or `this`"
                 }
             ],
             "source": "npm",

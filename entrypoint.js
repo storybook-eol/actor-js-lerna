@@ -1,6 +1,6 @@
 const path = require('path')
 const shell = require('shelljs')
-const shellQuote = require('shell-quote')
+const shellEscape = require('shell-escape')
 const fs = require('fs')
 
 const REPO_PATH = '/repo'
@@ -12,6 +12,7 @@ const BATCH_MODE = JSON.parse(process.env.SETTING_BATCH_MODE || 'false')
 const dependencies = JSON.parse(process.env.DEPENDENCIES)['dependencies']
 
 shell.set('-e')  // any failing shell commands will fail
+shell.set('-v')
 
 // first need to install root dependencies so that the repo's version
 // of lerna is available
@@ -107,7 +108,7 @@ dependencies.forEach(function(dependency) {
       shell.exec(`git push --set-upstream origin ${branchName}`)
     }
     dependencyJSON = JSON.stringify({'dependencies': [dependency]})
-    shell.exec(shellQuote.quote(['pullrequest', '--branch', branchName, '--dependencies-schema', dependencyJSON, '--title-from-schema', '--body-from-schema']))
+    shell.exec(shellEscape(['pullrequest', '--branch', branchName, '--dependencies-schema', dependencyJSON, '--title-from-schema', '--body-from-schema']))
     console.log(`BEGIN_DEPENDENCIES_SCHEMA_OUTPUT>${dependencyJSON}<END_DEPENDENCIES_SCHEMA_OUTPUT`)
   }
 })
@@ -120,7 +121,7 @@ if (BATCH_MODE) {
     shell.exec(`git push --set-upstream origin ${batchPrBranchName}`)
   }
 
-  shell.exec(shellQuote.quote(['pullrequest', '--branch', batchPrBranchName, '--dependencies-schema', dependencyJSON, '--title-from-schema', '--body-from-schema']))
+  shell.exec(shellEscape(['pullrequest', '--branch', batchPrBranchName, '--dependencies-schema', dependencyJSON, '--title-from-schema', '--body-from-schema']))
 
   // mark them all complete at once
   console.log(`BEGIN_DEPENDENCIES_SCHEMA_OUTPUT>${dependencyJSON}<END_DEPENDENCIES_SCHEMA_OUTPUT`)
