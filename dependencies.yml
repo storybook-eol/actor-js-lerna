@@ -16,9 +16,11 @@ collectors:
       paths:
       - git_dependencies.yml
       - Dockerfile
+      - README.md
       patterns:
       - "installed: {version}"
       - "PULLREQUEST_VERSION={version}"
+      - "https://github.com/dependencies-io/pullrequest/tree/{version}#dependenciesyml"
 
 - type: js-npm
   path: /

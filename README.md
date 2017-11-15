@@ -31,23 +31,9 @@ collectors:
       # false by default, set to true if you want all dependency updates in a single PR
       batch_mode: false
 
-      # github options
-      github_labels:  # list of label names
-      - bug
-      github_assignees:  # list of usernames
-      - davegaeddert
-      github_milestone: 3  # milestone number
-      github_base_branch: develop  # branch to make PR against (if something other than your default branch)
-
-      # gitlab options
-      gitlab_assignee_id: 1  # assignee user ID
-      gitlab_labels:  # labels for MR as a list of strings
-      - dependencies
-      - update
-      gitlab_milestone_id: 1  # the ID of a milestone
-      gitlab_target_project_id: 1  # The target project (numeric id)
-      gitlab_remove_source_branch: true  # flag indicating if a merge request should remove the source branch when merging
-      gitlab_target_branch: develop  # branch to make PR against (if something other than your default branch)
+      # Settings to configure the PR itself can be found
+      # on the dependencies-io/pullrequest repo
+      # https://github.com/dependencies-io/pullrequest/tree/0.6.0#dependenciesyml
 ```
 
 ### Works well with
