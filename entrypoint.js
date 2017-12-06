@@ -55,6 +55,7 @@ dependencies.forEach(function(dependency) {
   const installed = dependency.installed.version
   const dependencyPath = path.join(REPO_PATH, dependency.path)
 
+  const packageLockJsonPath = path.join(dependencyPath, 'package-lock.json')
   const packageJsonPath = path.join(dependencyPath, 'package.json')
   const packageJson = require(packageJsonPath)
   const isDevDependency = packageJson.hasOwnProperty('devDependencies') && packageJson.devDependencies.hasOwnProperty(name)
@@ -88,13 +89,16 @@ dependencies.forEach(function(dependency) {
 
   const versionWithRangeSpecifier = packageJsonVersionRangeSpecifier + version
 
-  let npmInstallOpts = '--ignore-scripts --quiet --no-package-lock'
+  let npmInstallOpts = '--ignore-scripts --quiet --package-lock-only'
   if (packageJsonVersionRangeSpecifier === '') {
       npmInstallOpts += ' --save-exact'
   }
 
   // update package.json and then re-run lerna bootstrap
+  const packageLockExisted = fs.existsSync(packageLockJsonPath)
   shell.exec(`cd ${dependencyPath} && npm install ${npmInstallOpts} ${name}@${versionWithRangeSpecifier}`)
+  if (!packageLockExisted) shell.rm(packageLockJsonPath)
+
   bootstrap()
 
   console.log('This is the git status after performing the update:')
