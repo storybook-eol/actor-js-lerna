@@ -2,6 +2,7 @@ const path = require('path')
 const shell = require('shelljs')
 const shellEscape = require('shell-escape')
 const fs = require('fs')
+const detectIndent = require('detect-indent')
 
 const REPO_PATH = '/repo'
 const TESTING = (process.env.DEPENDENCIES_ENV || 'production') == 'test'
@@ -53,13 +54,6 @@ dependencies.forEach(function(dependency) {
 
   const name = dependency.name
   const installed = dependency.installed.version
-  const dependencyPath = path.join(REPO_PATH, dependency.path)
-
-  const packageLockJsonPath = path.join(dependencyPath, 'package-lock.json')
-  const packageJsonPath = path.join(dependencyPath, 'package.json')
-  const packageJson = require(packageJsonPath)
-  const isDevDependency = packageJson.hasOwnProperty('devDependencies') && packageJson.devDependencies.hasOwnProperty(name)
-
   const version = dependency.available[0].version
   let branchName = `${name}-${version}-${ACTOR_ID}`
   if (dependency.path !== '/') {
@@ -73,31 +67,38 @@ dependencies.forEach(function(dependency) {
     shell.exec(`git checkout -b ${branchName}`)
   }
 
-  let packageJsonVersionSpecifier
-  if (isDevDependency) {
-    packageJsonVersionSpecifier = packageJson.devDependencies[name]
-  } else {
-    packageJsonVersionSpecifier = packageJson.dependencies[name]
-  }
+  const packageJsonPath = path.join(REPO_PATH, dependency.path, 'package.json')
+  const file = fs.readFileSync(packageJsonPath, 'utf8')
+  // tries to detect the indentation and falls back to a default if it can't
+  const indent = detectIndent(file).indent || '  '
+  const packageJson = JSON.parse(file)
 
-  let packageJsonVersionRangeSpecifier = ''
-  if (packageJsonVersionSpecifier.startsWith('^')) {
-    packageJsonVersionRangeSpecifier = '^'
-  } else if (packageJsonVersionSpecifier.startsWith('~')) {
-    packageJsonVersionRangeSpecifier = '~'
-  }
+  const depTypes = [
+    'dependencies',
+    'devDependencies',
+    'peerDependencies',
+    'optionalDependencies',
+    'bundledDependencies',
+  ]
 
-  const versionWithRangeSpecifier = packageJsonVersionRangeSpecifier + version
+  depTypes.forEach(t => {
+    if (packageJson.hasOwnProperty(t) && packageJson[t].hasOwnProperty(name)) {
+      const currentRange = packageJson[t][name]
+      // get the prefix they were using and keep using it
+      let packageJsonVersionRangeSpecifier = ''
+      if (currentRange.startsWith('^')) {
+        packageJsonVersionRangeSpecifier = '^'
+      } else if (currentRange.startsWith('~')) {
+        packageJsonVersionRangeSpecifier = '~'
+      }
+      // update package.json with the new range
+      const constraint = packageJsonVersionRangeSpecifier + version
+      console.log(`Updating ${name} to ${constraint} in ${t} of ${packageJsonPath}`)
+      packageJson[t][name] = constraint
+    }
+  })
 
-  let npmInstallOpts = '--ignore-scripts --quiet --package-lock-only'
-  if (packageJsonVersionRangeSpecifier === '') {
-      npmInstallOpts += ' --save-exact'
-  }
-
-  // update package.json and then re-run lerna bootstrap
-  const packageLockExisted = fs.existsSync(packageLockJsonPath)
-  shell.exec(`cd ${dependencyPath} && npm install ${npmInstallOpts} ${name}@${versionWithRangeSpecifier}`)
-  if (!packageLockExisted) shell.rm(packageLockJsonPath)
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, indent) + '\n')
 
   bootstrap()
 
